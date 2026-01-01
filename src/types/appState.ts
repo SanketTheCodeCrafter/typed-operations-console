@@ -1,6 +1,5 @@
-import type { User } from "./user";
-
+import type { AuthState } from "./auth";
 
 export interface AppState{
-    readonly currentUser: User | null;
+    readonly auth: AuthState;
 }
