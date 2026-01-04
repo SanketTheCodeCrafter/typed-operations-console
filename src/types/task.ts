@@ -12,3 +12,10 @@ export interface Task<TFormData = unknown> {
   readonly data: TFormData;
   readonly createdAt: string;
 }
+
+export const TASK_STATUS_FLOW: Record<TaskStatus, TaskStatus[]> = {
+  todo: ['in_progress'],
+  in_progress: ['review'],
+  review: ['done'],
+  done: [],
+};

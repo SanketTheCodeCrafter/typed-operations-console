@@ -1,4 +1,5 @@
 import type { AppState } from "../types/appState";
+import { TASK_STATUS_FLOW } from "../types/task";
 import type { AppAction } from "./actions";
 
 export const initialAppState: AppState = {
@@ -27,6 +28,35 @@ export function appReducer(
         projects: state.projects.filter(
           (project) => project.id !== action.payload.projectId
         ),
+      };
+    }
+
+    case 'ADD_TASK': {
+      return {
+        ...state,
+        tasks: [...state.tasks, action.payload],
+      };
+    }
+
+    case 'UPDATE_TASK_STATUS': {
+      const { taskId, nextStatus } = action.payload;
+
+      return {
+        ...state,
+        tasks: state.tasks.map((task)=>{
+          if(task.id !== taskId) return task;
+
+          const allowedNext = TASK_STATUS_FLOW[task.status];
+
+          if(!allowedNext.includes(nextStatus)){
+            return task;
+          }
+
+          return {
+            ...task,
+            status: nextStatus
+          };
+        }),
       };
     }
 
