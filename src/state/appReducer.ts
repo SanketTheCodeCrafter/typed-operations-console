@@ -23,15 +23,28 @@ export function appReducer(
     }
 
     case "REMOVE_PROJECT": {
+      const { projectId } = action.payload;
+
       return {
         ...state,
         projects: state.projects.filter(
-          (project) => project.id !== action.payload.projectId
+          (project) => project.id !== projectId
+        ),
+        tasks: state.tasks.filter(
+          (task) => task.projectId !== projectId
         ),
       };
     }
 
     case 'ADD_TASK': {
+      const projectExists = state.projects.some(
+        (project) => project.id === action.payload.projectId
+      );
+
+      if(!projectExists){
+        return state;
+      }
+
       return {
         ...state,
         tasks: [...state.tasks, action.payload],
