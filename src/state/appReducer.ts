@@ -74,7 +74,11 @@ export function appReducer(
     }
 
     default: {
-      return state;
+      return assertNever(action);
     }
   }
+}
+
+function assertNever(x: never): never{
+  throw new Error(`Unhandled action: ${JSON.stringify(x)}`)
 }

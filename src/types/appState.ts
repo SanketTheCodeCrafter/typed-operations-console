@@ -3,7 +3,7 @@ import type { Project } from "./project";
 import type { Task } from "./task";
 
 export interface AppState{
-    auth: AuthState;
-    projects: Project[];
-    tasks: Task[];
+    readonly auth: AuthState;
+    readonly projects: Project[];
+    readonly tasks: Task[];
 }
