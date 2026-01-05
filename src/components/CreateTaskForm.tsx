@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAppState } from "../hooks/useAppState";
-import type { Task } from "../types/task";
-import { generateId } from "../utils/id";
+import { createTodoTask } from "../utils/taskFactory";
 
 
 type Props = {
@@ -16,13 +15,7 @@ export const CreateTaskForm: React.FC<Props> = ({ projectId }) => {
         e.preventDefault();
         if (!title.trim()) return;
 
-        const task: Task<{ title: string }> = {
-            id: generateId('task'),
-            projectId,
-            status: 'todo',
-            data: { title },
-            createdAt: new Date().toISOString(),
-        };
+        const task = createTodoTask(projectId, { title });
 
         dispatch({ type: 'ADD_TASK', payload: task });
 
