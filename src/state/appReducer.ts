@@ -8,6 +8,7 @@ export const initialAppState: AppState = {
   },
   projects: [],
   tasks: [],
+  formSchemas: [],
 };
 
 export function appReducer(
@@ -72,6 +73,22 @@ export function appReducer(
         }),
       };
     }
+
+    case 'ADD_FORM_SCHEMA': {
+      return {
+        ...state, 
+        formSchemas: [...state.formSchemas, action.payload],
+      };
+    }
+
+    case 'REMOVE_FORM_SCHEMA': {
+      return {
+        ...state,
+        formSchemas: state.formSchemas.filter(
+          (schema) => schema.id !== action.payload.schemaId
+        ),
+      };
+    }    
 
     default: {
       return assertNever(action);
