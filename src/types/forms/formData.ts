@@ -3,6 +3,7 @@ import type { TextField } from "./textField";
 import type { NumberField } from "./numberField";
 import type { SelectField } from "./selectField";
 import type { FormSchema } from "./formSchema";
+import type { Task } from "../task";
 
 export type FieldValue<F extends FormField> =
   F extends TextField ? string :
@@ -20,3 +21,7 @@ export type FieldValue<F extends FormField> =
 export type FormDataFromSchema<
 Schema extends FormSchema
 > = FormDataFromFields<Schema['fields']>;
+
+export type TaskFromSchema<
+Schema extends FormSchema
+>=Task<FormDataFromSchema<Schema>>
