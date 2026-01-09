@@ -5,8 +5,8 @@ import type { FormSchema } from "../../types/forms/formSchema";
 
 
 type Props<S extends FormSchema> = {
-    schema: S;
-    onSubmit: (data: FormDataFromSchema<S>) => void;
+    readonly schema: S;
+    readonly onSubmit: (data: FormDataFromSchema<S>) => void;
 };
 
 export function DynamicForm<S extends FormSchema>({
@@ -22,6 +22,13 @@ export function DynamicForm<S extends FormSchema>({
             [id]: value,
         }));
     };
+
+    /**
+ * Runtime boundary:
+ * Form data is assembled dynamically from schema-driven inputs.
+ * TypeScript cannot prove completeness at compile time.
+ * We assert correctness here intentionally.
+ */
 
     const finalizeFormData = (
         data: Partial<FormDataFromSchema<S>>

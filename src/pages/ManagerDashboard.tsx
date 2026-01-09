@@ -10,6 +10,17 @@ export const ManagerDashboard = () => {
   const { logout } = useAuth();
   const { state, dispatch } = useAppState();
 
+  if (state.projects.length === 0) {
+    return (
+      <div>
+        <h1>Manager Dashboard</h1>
+        <p>No project available. Please ask an admin to create a project.</p>
+        <button onClick={logout}>Logout</button>
+      </div>
+    );
+  }
+
+
   return (
     <div>
       <h1>Manager Dashboard</h1>
@@ -22,11 +33,11 @@ export const ManagerDashboard = () => {
         </div>
       ))}
 
-      {state.formSchemas.map((schema)=>(
+      {state.formSchemas.map((schema) => (
         <DynamicForm
           key={schema.id}
           schema={schema}
-          onSubmit={(data)=>{
+          onSubmit={(data) => {
             const task: TaskFromSchema<typeof schema> = {
               id: generateId('task'),
               projectId: state.projects[0]?.id ?? 'unknown',
