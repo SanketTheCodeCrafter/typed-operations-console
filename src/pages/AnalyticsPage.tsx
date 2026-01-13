@@ -17,7 +17,6 @@ const AnalyticsPage: FC = () => {
         <div>
             <h1>Analytics</h1>
 
-            {/* Phase 5.5: skeleton only */}
             <TaskMetrics metrics={taskMetrics} />
             <ProjectAnalyticsTable projects={projectAnalytics} />
             <SchemaAnalyticsTable analytics={schemaAnalytics} />

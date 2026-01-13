@@ -28,12 +28,19 @@ export interface ProjectAnalytics {
     readonly health: ProjectHealth;
 }
 
+let lastState: Readonly<AppState> | null = null;
+let lastResult: readonly ProjectAnalytics[] | null = null;
+
 export const getProjectAnalytics = (
     state: Readonly<AppState>
 ): readonly ProjectAnalytics[] => {
+    if (state === lastState && lastResult !== null) {
+        return lastResult;
+    }
+
     const tasks = selectAllTasks(state);
 
-    return state.projects.map(project => {
+    const result = state.projects.map(project => {
         const projectTasks = tasks.filter(
             task => task.projectId === project.id
         );
@@ -41,39 +48,37 @@ export const getProjectAnalytics = (
         const totalTasks = projectTasks.length;
 
         const completedTasks = projectTasks.filter(
-            task => task.status === 'done'
+            task => task.status === "done"
         ).length;
 
         const pendingTasks = totalTasks - completedTasks;
 
+        const completionRate =
+            totalTasks === 0 ? 0 : completedTasks / totalTasks;
+
+        const health: ProjectHealth = (() => {
+            if (totalTasks === 0) return "empty";
+            if (completedTasks === totalTasks) return "healthy";
+            if (completedTasks > 0 && pendingTasks > 0) return "healthy";
+            if (completedTasks === 0 && pendingTasks > 0) return "in_progress";
+            return "stalled";
+        })();
+
+        
         return {
             projectId: project.id,
             projectName: project.name,
             totalTasks,
             completedTasks,
             pendingTasks,
-            completionRate:
-                totalTasks === 0 ? 0 : completedTasks / totalTasks,
-            health: (() => {
-                if (totalTasks === 0) {
-                    return "empty";
-                }
-
-                if (completedTasks === totalTasks) {
-                    return "healthy";
-                }
-
-                if (completedTasks > 0 && pendingTasks > 0) {
-                    return "healthy";
-                }
-
-                if (completedTasks === 0 && pendingTasks > 0) {
-                    return "in_progress";
-                }
-
-                return "stalled";
-            })(),
-
+            completionRate,
+            health,
         };
     });
+
+    lastState = state;
+    lastResult = result;
+
+    return lastResult;
 };
+

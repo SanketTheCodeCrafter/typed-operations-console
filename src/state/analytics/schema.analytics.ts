@@ -19,48 +19,58 @@ export interface SchemaAnalytics{
     readonly summary: SchemaAnalyticsSummary;
 }
 
-export const getSchemaAnalytics=(
-    state: Readonly<AppState>
-): SchemaAnalytics=>{
-    const schemaUsageMap = new Map<string, number>();
-    let tasksWithoutSchemas = 0;
+let lastState: Readonly<AppState> | null = null;
+let lastResult: SchemaAnalytics | null = null;
 
-    //count task usage per schema
-    for(const task of state.tasks){
-        if(!task.schemaId){
-            tasksWithoutSchemas++;
-            continue;
-        }
+export const getSchemaAnalytics = (
+  state: Readonly<AppState>
+): SchemaAnalytics => {
+  if (state === lastState && lastResult !== null) {
+    return lastResult;
+  }
 
-        schemaUsageMap.set(
-            task.schemaId,
-            (schemaUsageMap.get(task.schemaId) ?? 0) + 1
-        );
+  const schemaUsageMap = new Map<string, number>();
+  let tasksWithoutSchemas = 0;
+
+  for (const task of state.tasks) {
+    if (!task.schemaId) {
+      tasksWithoutSchemas += 1;
+      continue;
     }
 
-    //build per schema analytics
-    const schemas: SchemaUsageAnalytics[] = state.formSchemas.map(schema => {
-        const taskCount = schemaUsageMap.get(schema.id) ?? 0;
+    schemaUsageMap.set(
+      task.schemaId,
+      (schemaUsageMap.get(task.schemaId) ?? 0) + 1
+    );
+  }
 
-        return {
-            schemaId: schema.id,
-            schemaName: schema.name,
-            taskCount,
-            isUsed: taskCount > 0,
-        };
-    });
-
-    const totalSchemas = schemas.length;
-    const usedSchemas = schemas.filter(schema => schema.isUsed).length;
-    const unusedSchemas = totalSchemas - usedSchemas;
+  const schemas = state.formSchemas.map(schema => {
+    const taskCount = schemaUsageMap.get(schema.id) ?? 0;
 
     return {
-        schemas,
-        summary: {
-            totalSchemas,
-            usedSchemas,
-            unusedSchemas,
-            tasksWithoutSchemas,
-        },
+      schemaId: schema.id,
+      schemaName: schema.name,
+      taskCount,
+      isUsed: taskCount > 0,
     };
+  });
+
+  const totalSchemas = schemas.length;
+  const usedSchemas = schemas.filter(s => s.isUsed).length;
+  const unusedSchemas = totalSchemas - usedSchemas;
+
+  const result: SchemaAnalytics = {
+    schemas,
+    summary: {
+      totalSchemas,
+      usedSchemas,
+      unusedSchemas,
+      tasksWithoutSchemas,
+    },
+  };
+
+  lastState = state;
+  lastResult = result;
+
+  return lastResult;
 };
